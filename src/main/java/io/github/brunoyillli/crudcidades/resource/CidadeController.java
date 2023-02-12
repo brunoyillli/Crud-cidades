@@ -6,11 +6,13 @@ import java.util.Set;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import io.github.brunoyillli.crudcidades.entity.Cidade;
+import jakarta.validation.Valid;
 
 @Controller
 public class CidadeController {
@@ -30,8 +32,18 @@ public class CidadeController {
 	}
 
 	@PostMapping("/criar")
-	public String criar(Cidade cidade) {
-		cidades.add(cidade);
+	public String criar(@Valid Cidade cidade, BindingResult validacao, Model memoria) {
+
+		if (validacao.hasErrors()) {
+			validacao.getFieldErrors()
+					.forEach(error -> memoria.addAttribute(error.getField(), error.getDefaultMessage()));
+			memoria.addAttribute("nomeInformado", cidade.getNome());
+			memoria.addAttribute("estadoInformado",cidade.getEstado());
+			memoria.addAttribute("listaCidades", cidades);
+			return "/crud";
+		} else {
+			cidades.add(cidade);
+		}
 		return "redirect:/";
 	}
 
@@ -53,11 +65,10 @@ public class CidadeController {
 	}
 
 	@PostMapping("/alterar")
-	public String alterar(@RequestParam String nomeAtual, @RequestParam String estadoAtual, Cidade cidade) {
+	public String alterar(@RequestParam String nomeAtual, @RequestParam String estadoAtual, Cidade cidade, BindingResult validacao, Model memoria) {
 		cidades.removeIf(
-				cidadeAtual -> cidadeAtual.getNome().equals(nomeAtual) 
-				&& cidadeAtual.getEstado().equals(estadoAtual));
-		criar(cidade);
+				cidadeAtual -> cidadeAtual.getNome().equals(nomeAtual) && cidadeAtual.getEstado().equals(estadoAtual));
+		criar(cidade, validacao, memoria);
 		return "redirect:/";
 	}
 }
