@@ -13,6 +13,7 @@
 <body>
 	
 	<nav class="navbar navbar-expand-sn bg-dark">
+	<span class="navbar-brand text-white">${usuarioAtual}</span>
 		<ul class="navbar-nav ml-auto">
 			<li class="nav-item">
 				<a href="/logout" class="nav-link btn btn-secondary">
